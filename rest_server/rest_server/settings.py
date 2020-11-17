@@ -42,7 +42,7 @@ SECRET_KEY = get_env_variable("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.249.19.250']
+ALLOWED_HOSTS = ['192.249.19.250', '127.0.0.1']
 
 # Application definition
 
@@ -55,10 +55,17 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
-    'rest_framework_swagger',
+    'drf_yasg',
 
-    'route'
+    'covid'
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ]
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

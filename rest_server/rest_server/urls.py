@@ -13,18 +13,34 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
 from django.urls import path, include
-from rest_framework import routers
-from rest_framework_swagger.views import get_swagger_view
-
-import route.api
+from django.views.generic import RedirectView
+from rest_framework import routers, permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+import covid.api
 
 router = routers.DefaultRouter()
-router.register('route', route.api.RouteViewSet)
+router.register('route', covid.api.RouteViewSet)
+router.register('temperature', covid.api.TemperatureViewSet)
+
+schema_url_patterns = [
+    path('api/v1/', include((router.urls, 'covid'), namespace='api')),
+]
+
+schema_view = get_schema_view(
+    openapi.Info(
+        title="Django API",
+        default_version='v1',
+        terms_of_service="https://www.google.com/policies/terms/",
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+    patterns=schema_url_patterns,
+)
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/doc/', get_swagger_view(title='REST API Document')),
-    path('api/v1/', include((router.urls, 'route'), namespace='api'))
+    path('api/v1/', include((router.urls, 'covid'), namespace='api')),
+    path('', RedirectView.as_view(url='api/v1/doc')),
+    path('api/v1/doc/', schema_view.with_ui('swagger', cache_timeout=0)),
 ]
