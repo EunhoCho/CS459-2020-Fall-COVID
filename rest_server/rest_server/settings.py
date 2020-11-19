@@ -25,7 +25,7 @@ import json
 from django.core.exceptions import ImproperlyConfigured
 
 # 프로젝트 루트로부터 secrets.json 파일 경로 찾기
-secret_file = os.path.join(BASE_DIR, '../secret_key.json')
+secret_file = os.path.join(BASE_DIR, './secret_key.json')
 
 with open(secret_file) as f:
     secrets = json.loads(f.read())

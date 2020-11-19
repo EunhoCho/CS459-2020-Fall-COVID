@@ -23,6 +23,7 @@ import covid.api
 router = routers.DefaultRouter()
 router.register('route', covid.api.RouteViewSet)
 router.register('temperature', covid.api.TemperatureViewSet)
+router.register('user', covid.api.UserViewSet)
 
 schema_url_patterns = [
     path('api/v1/', include((router.urls, 'covid'), namespace='api')),
