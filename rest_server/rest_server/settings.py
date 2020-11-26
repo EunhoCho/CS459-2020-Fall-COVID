@@ -15,7 +15,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
@@ -30,12 +29,14 @@ secret_file = os.path.join(BASE_DIR, './secret_key.json')
 with open(secret_file) as f:
     secrets = json.loads(f.read())
 
+
 def get_env_variable(key):
     try:
         return secrets[key]
     except KeyError:
         error_msg = f"Set the {key} environment variable"
         raise ImproperlyConfigured(error_msg)
+
 
 SECRET_KEY = get_env_variable("DJANGO_SECRET_KEY")
 
@@ -97,7 +98,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'rest_server.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
@@ -107,7 +107,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -127,20 +126,18 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.1/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/

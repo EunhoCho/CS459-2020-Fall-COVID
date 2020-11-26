@@ -1,17 +1,25 @@
+from datetime import datetime, timedelta
+
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+from rest_framework import serializers, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from . import route_similarity
 from .models import Route, Temperature, User
-from rest_framework import serializers, viewsets
 
-userID_parameter = openapi.Parameter('userID', openapi.IN_QUERY, description="ID of the user", type=openapi.TYPE_INTEGER)
+userID_parameter = openapi.Parameter('userID', openapi.IN_QUERY, description="ID of the user",
+                                     type=openapi.TYPE_INTEGER, required=True)
+date_parameter = openapi.Parameter('date', openapi.IN_QUERY, description="search date limitation", required=False,
+                                   type=openapi.TYPE_INTEGER)
+
 
 class RouteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Route
         fields = '__all__'
+
 
 class RouteViewSet(viewsets.ModelViewSet):
     queryset = Route.objects.all()
@@ -39,7 +47,7 @@ class RouteViewSet(viewsets.ModelViewSet):
         return super().create(request, *args, **kwargs)
 
     @swagger_auto_schema(tags=['Show the route of the target user'],
-                         manual_parameters=[userID_parameter],
+                         manual_parameters=[userID_parameter, date_parameter],
                          responses={400: "No User Found / No Route Found"})
     @action(detail=False)
     def user(self, request):
@@ -49,6 +57,9 @@ class RouteViewSet(viewsets.ModelViewSet):
             return Response({400: "No User Found"}, status=400)
 
         queryset = self.queryset.filter(userID__exact=userID)
+        date = int(request.query_params.get('date'))
+        if date:
+            queryset = queryset.filter(datetime__gt=datetime.now() - timedelta(days=date))
         if len(queryset) == 0:
             return Response({400: "No Route Found"}, status=400)
 
@@ -91,6 +102,7 @@ class TemperatureSerializer(serializers.ModelSerializer):
     class Meta:
         model = Temperature
         fields = '__all__'
+
 
 class TemperatureViewSet(viewsets.ModelViewSet):
     queryset = Temperature.objects.all()
@@ -137,6 +149,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = '__all__'
 
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -162,6 +175,9 @@ class UserViewSet(viewsets.ModelViewSet):
             user.save()
             data = self.queryset.filter(id=userID)
             serializer = UserSerializer(data, many=True)
+
+            print(route_similarity.check_similarity(userID))
+
             return Response(serializer.data, status=200)
         else:
             return Response({400: "No User Found"}, status=400)
