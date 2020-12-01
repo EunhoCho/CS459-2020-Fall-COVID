@@ -6,7 +6,7 @@ from rest_framework import serializers, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from . import route_similarity
+from . import route_similarity, notify
 from .models import Route, Temperature, User
 
 userID_parameter = openapi.Parameter('userID', openapi.IN_QUERY, description="ID of the user",
@@ -57,9 +57,8 @@ class RouteViewSet(viewsets.ModelViewSet):
             return Response({400: "No User Found"}, status=400)
 
         queryset = self.queryset.filter(userID__exact=userID)
-        date = int(request.query_params.get('date'))
-        if date:
-            queryset = queryset.filter(datetime__gt=datetime.now() - timedelta(days=date))
+        if request.query_params.get('date'):
+            queryset = queryset.filter(datetime__gt=datetime.now() - timedelta(days=int(request.query_params.get('date'))))
         if len(queryset) == 0:
             return Response({400: "No Route Found"}, status=400)
 
@@ -176,7 +175,8 @@ class UserViewSet(viewsets.ModelViewSet):
             data = self.queryset.filter(id=userID)
             serializer = UserSerializer(data, many=True)
 
-            print(route_similarity.check_similarity(userID))
+            for suspect in route_similarity.check_similarity(userID):
+                notify.send_notify("코로나바이러스 감염증 19 검사 대상자입니다.")
 
             return Response(serializer.data, status=200)
         else:
