@@ -43,7 +43,7 @@ SECRET_KEY = get_env_variable("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.249.19.250', '127.0.0.1']
+ALLOWED_HOSTS = ['safety-kaist.ml', '193.123.231.190', '127.0.0.1']
 
 # Application definition
 
@@ -57,6 +57,8 @@ INSTALLED_APPS = [
 
     'rest_framework',
     'drf_yasg',
+    'corsheaders',
+    'sslserver',
 
     'covid'
 ]
@@ -69,6 +71,7 @@ REST_FRAMEWORK = {
 }
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -77,6 +80,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_ORIGIN_ALLOW_ALL = True
 
 ROOT_URLCONF = 'rest_server.urls'
 
